@@ -287,8 +287,9 @@ body{font-family:"Offset",Georgia,serif;background:var(--surface);color:var(--in
     <div id="mem-list" style="margin-bottom:14px"></div>
     <div style="border-top:1px solid var(--border);padding-top:14px">
       <label class="fl">Add New Member</label>
-      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:5px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-top:5px">
         <input class="fi" id="new-mem" placeholder="Full name...">
+        <input class="fi" id="new-mem-email" placeholder="Email address..." type="email">
         <select class="fs" id="new-mem-cat"><option value="overhead">Overhead Mgmt</option><option value="store">Store Mgmt</option></select>
         <button class="btn btn-red" id="btn-add-member">Add</button>
       </div>
@@ -600,8 +601,12 @@ function renderMemList(){
     if(!mems.length) html+='<div style="font-size:11.5px;color:var(--ink3);padding:4px 6px;font-style:italic">No members yet</div>';
     mems.forEach(function(m){
       var canRm=m.id!=="M"&&m.id!=="D";
+      var emailBadge=m.email?'<span style="font-size:10px;color:var(--ink3);margin-left:4px">'+esc(m.email)+'</span>':'<span style="font-size:10px;color:#ccc;margin-left:4px;font-style:italic">no email</span>';
       html+='<div class="mem-row"><div class="av lg" style="background:'+m.color+'">'+initials(m.name)+'</div>'
-        +'<span class="nm">'+esc(m.name)+'</span><span class="mem-cat">'+cats[m.cat]+'</span>'
+        +'<span class="nm">'+esc(m.name)+'</span>'
+        +'<span class="mem-cat">'+cats[m.cat]+'</span>'
+        +emailBadge
+        +'<button class="rem-btn" data-action="edit-member-email" data-id="'+m.id+'" title="Edit email" style="color:#93c5fd;font-size:11px;width:auto;padding:2px 6px;border-radius:4px">✉</button>'
         +(canRm?'<button class="rem-btn" data-action="remove-member" data-id="'+m.id+'">&#215;</button>':"")
         +'</div>';
     });
@@ -618,6 +623,19 @@ function addMember(){
   api("saveMember",m).catch(function(){});
   saveCache(); inp.value=""; renderMemList(); renderSidebar(); showToast(name+" added!");
 }
+
+function editMemberEmail(id){
+  var m=members.find(function(x){return x.id===id;});
+  if(!m) return;
+  var email=prompt("Enter email address for "+m.name+":", m.email||"");
+  if(email===null) return; // cancelled
+  m.email=email.trim();
+  api("updateMemberEmail",{id:id,email:m.email}).catch(function(){});
+  saveCache();
+  renderMemList();
+  showToast("Email updated for "+m.name);
+}
+
 function removeMember(id){
   members=members.filter(function(m){return m.id!==id;});
   api("deleteMember",{id:id}).catch(function(){});
@@ -650,6 +668,7 @@ document.addEventListener("click",function(e){
       if(a==="pick-color"){selColor=el.dataset.color;renderColorPicker();return;}
       if(a==="delete-proj"){e.stopPropagation();deleteProject(el.dataset.proj);return;}
       if(a==="remove-member"){removeMember(el.dataset.id);return;}
+      if(a==="edit-member-email"){editMemberEmail(el.dataset.id);return;}
     }
     el=el.parentElement;
   }
