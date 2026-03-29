@@ -301,7 +301,7 @@ body{font-family:"Offset",Georgia,serif;background:var(--surface);color:var(--in
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────
-var SHEET_URL = localStorage.getItem("pizarro_sheet_url") || "";
+var SHEET_URL = "https://script.google.com/macros/s/AKfycbxAT9awyAYSgrsghJE7YhuJc_NKGBw0SnCZG7N0xxd2pB46TlAnPYAfJl4BCMEDm5Yt/exec";
 var PALETTE = ["#C8102E","#2563eb","#16a34a","#d97706","#7c3aed","#0891b2","#be185d","#ea580c","#0d9488","#4f46e5"];
 var selColor = PALETTE[0];
 
@@ -704,7 +704,7 @@ document.addEventListener("keydown",function(e){
 });
 
 // ── INIT ──────────────────────────────────────────────────────────────
-if(SHEET_URL) document.getElementById("setup-banner").classList.add("hidden");
+document.getElementById("setup-banner").classList.add("hidden");
 loadAll();
 setInterval(function(){ if(SHEET_URL) loadAll(); }, 60000);
 </script>
